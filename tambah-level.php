@@ -7,38 +7,15 @@
   if (isset($_POST['simpan'])) {
     $nama_level = $_POST['nama_level'];
 
-    //$_POST: form input name=''
-    //$_GET: url ?param='nilai'
-    //$_FILES: from uploaded files
-
-    // if(!empty($_FILES['foto']['name'])){
-    //     $nama_foto = $_FILES['foto']['name'];
-    //     $ukuran_foto = $_FILES['foto']['size'];
-
-
-    //     //png, jpg, jpeg
-    //     $ext = array('png', 'jpg', 'jpeg');
-    //     $extFoto = pathinfo($nama_foto, PATHINFO_EXTENSION);
-
-    //     // jika extension foto tidak ada/ tidak sesuai dengan ext yang telah di-declare di array $ext
-    //     if (!in_array($extFoto, $ext)) {
-    //         echo "Ekstensi/jenis file tidak ditemukan. Ekstensi yang diizinkan: " . implode(", ", $extFoto);
-    //         die;
-    //     }else {
-    //         //pindah directory gambar ke folder upload (tmp/temporary path)
-    //         move_uploaded_file($_FILES['foto']['tmp_name'], 'upload/' . $nama_foto);
-
-    //         $insert = mysqli_query($koneksi, "INSERT INTO user (nama, email, password, foto) VALUES ('$nama', '$email', '$password','$nama_foto')");
-
-    //     }
-    // } else {
+   
     $insert = mysqli_query($koneksi, "INSERT INTO level (nama_level) VALUES ('$nama_level')");
-    // }
 
     header("location:level.php?tambah=berhasil");
   }
 
-  //EDIT/UPDATA ACCOUNT DATA
+  //EDIT/UPDATE
+
+//   ID = GET from PARAMETER
   $id = isset($_GET['edit']) ? $_GET['edit'] : '';
   $queryEdit = mysqli_query($koneksi, "SELECT * FROM level WHERE id='$id'");
   $rowEdit = mysqli_fetch_assoc($queryEdit);
@@ -49,12 +26,6 @@
   if (isset($_POST['edit'])) {
     $nama_level = $_POST['nama_level'];
 
-    //jika password diisi oleh user
-    // if ($_POST['password']) {
-    //     $password = $_POST['password'];
-    // }else {
-    //     $password = $rowEdit['password'];
-    // }
 
     $update = mysqli_query($koneksi, "UPDATE level SET nama_level='$nama_level' WHERE id='$id'");
     header("location:level.php?ubah=berhasil");
@@ -130,6 +101,12 @@
                                             Data berhasil dihapus!
                                         </div>
                                         <?php endif ?>
+
+                                     <div class="mb-3">
+                                        <a href="level.php" class="btn btn-secondary">
+                                            <i class="fas fa-arrow-left"></i>
+                                        </a>
+                                    </div>
 
 
                                         <form action="" method="POST" enctype="multipart/form-data">

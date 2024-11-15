@@ -120,26 +120,26 @@
             <?php endif ?>
             <!-- End of Master Data -->
 
-            <?php if ($_SESSION['id_level'] == 1 OR $_SESSION['id_level'] == 2): ?>
+            <?php if ($_SESSION['id_level'] == 1 OR $_SESSION['id_level'] == 2 OR $_SESSION['id_level'] == 4): ?>
             <!-- Transaksi Side -->
             <li class="menu-item">
               <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons bx bx-lock-open-alt"></i>
+                <i class="menu-icon tf-icons fa-solid fa-money-bill"></i>
                 <div data-i18n="Authentications">Transaksi</div>
               </a>
               <ul class="menu-sub">
                 <li class="menu-item">
-                  <a href="instruktur.php" class="menu-link" target="_blank">
+                  <a href="transaction.php" class="menu-link">
                     <div data-i18n="Basic">Data Transaksi</div>
                   </a>
                 </li>
                 <li class="menu-item">
-                  <a href="auth-register-basic.html" class="menu-link" target="_blank">
+                  <a href="auth-register-basic.html" class="menu-link">
                     <div data-i18n="Basic">Transaksi Pengembalian</div>
                   </a>
                 </li>
                 <li class="menu-item">
-                  <a href="auth-forgot-password-basic.html" class="menu-link" target="_blank">
+                  <a href="auth-forgot-password-basic.html" class="menu-link">
                     <div data-i18n="Basic">Laporan</div>
                   </a>
                 </li>

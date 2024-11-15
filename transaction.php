@@ -3,59 +3,29 @@
   //muncul/pilih sebuah atau semua kolom dari table user
   include 'koneksi.php';
   
-  //jika button simpan ditekan, POST ambil value CREATE NEW ACCOUNT
-  if (isset($_POST['simpan'])) {
-    $service_name = $_POST['service_name'];
-    $price = $_POST['price'];
-    $description = $_POST['description'];
+  $queryTransOrder = mysqli_query($koneksi, "SELECT 
+    trans_order.id AS order_id,
+    trans_order.order_code,
+    trans_order.order_date,
+    trans_order.order_status,
+    customer.id AS customer_id,
+    customer.customer_name,
+    customer.phone,
+    customer.address
+FROM 
+    trans_order
+JOIN 
+    customer ON trans_order.id_customer = customer.id");
 
-    //$_POST: form input name=''
-    //$_GET: url ?param='nilai'
-    //$_FILES: from uploaded files
+  //mysqli_fetch_assoc($query) = untuk menjadikan hasil query menjadi sebuah data (object/array)
 
-    // if(!empty($_FILES['foto']['name'])){
-    //     $nama_foto = $_FILES['foto']['name'];
-    //     $ukuran_foto = $_FILES['foto']['size'];
+  //jika parameter ada ?delete=value[id] param
+  if (isset($_GET['delete'])) {
+    $id = $_GET['delete']; //mengambil nilai params
 
-
-    //     //png, jpg, jpeg
-    //     $ext = array('png', 'jpg', 'jpeg');
-    //     $extFoto = pathinfo($nama_foto, PATHINFO_EXTENSION);
-
-    //     // jika extension foto tidak ada/ tidak sesuai dengan ext yang telah di-declare di array $ext
-    //     if (!in_array($extFoto, $ext)) {
-    //         echo "Ekstensi/jenis file tidak ditemukan. Ekstensi yang diizinkan: " . implode(", ", $extFoto);
-    //         die;
-    //     }else {
-    //         //pindah directory gambar ke folder upload (tmp/temporary path)
-    //         move_uploaded_file($_FILES['foto']['tmp_name'], 'upload/' . $nama_foto);
-
-    //         $insert = mysqli_query($koneksi, "INSERT INTO user (nama, email, password, foto) VALUES ('$nama', '$email', '$password','$nama_foto')");
-
-    //     }
-    // } else {
-    $insert = mysqli_query($koneksi, "INSERT INTO type_of_service (service_name, price, description) VALUES ('$service_name', '$price', '$description')");
-    // }
-
-    header("location:paket.php?tambah=berhasil");
-  }
-
-  //EDIT/UPDATA ACCOUNT DATA
-  $id = isset($_GET['edit']) ? $_GET['edit'] : '';
-  $queryEdit = mysqli_query($koneksi, "SELECT * FROM type_of_service WHERE id='$id'");
-  $rowEdit = mysqli_fetch_assoc($queryEdit);
-  
-//   $dataService = mysqli_query($koneksi, "SELECT * FROM type_of_service ORDER BY id DESC");
-
-  // when button edit is clicked, insert/update into db
-  if (isset($_POST['edit'])) {
-    $service_name = $_POST['service_name'];
-    $price = $_POST['price'];
-    $description = $_POST['description'];
-
-
-    $update = mysqli_query($koneksi, "UPDATE type_of_service SET service_name='$service_name', price='$price', description='$description' WHERE id='$id'");
-    header("location:paket.php?ubah=berhasil");
+    //query / perintah hapus
+    $delete = mysqli_query($koneksi, "DELETE FROM transaction WHERE id='$id'");
+    header("location:transaction.php?hapus=berhasil");
   }
 ?>
 
@@ -99,9 +69,8 @@
     <!-- Layout wrapper -->
     <div class="layout-wrapper layout-content-navbar">
         <div class="layout-container">
-
             <!-- Menu -->
-             <?php include 'inc/head.php' ?>
+
             <?php include 'inc/sidebar.php' ?>
             <!-- / Menu -->
 
@@ -121,7 +90,7 @@
                         <div class="row">
                             <div class="col-sm-12">
                                 <div class="card">
-                                    <div class="card-header"><?php echo isset($_GET['edit']) ? 'Edit' : 'Tambah' ?> Paket Service</div>
+                                    <div class="card-header">Data Transaksi</div>
                                     <div class="card-body">
                                         <?php if(isset($_GET['hapus'])): ?>
                                         <div class="alert alert-success" role="alert">
@@ -129,37 +98,42 @@
                                         </div>
                                         <?php endif ?>
 
-                                        <div class="mb-3">
-                                            <a href="paket.php" class="btn btn-secondary">
-                                                <i class="fas fa-arrow-left"></i>
-                                            </a>
+                                        <div align="right" class="mb-3">
+                                            <a href="tambah-transaction.php" class="btn btn-primary">Tambah</a>
                                         </div>
 
 
-                                        <form action="" method="POST" enctype="multipart/form-data">
-                                            <div class="mb-3 row">
-                                                <div class="col-sm-6">
-                                                    <label for="" class="form-label">Nama Paket Service</label>
-                                                    <input type="text" class="form-control" name="service_name" placeholder="Masukkan nama paket" required value="<?php echo isset($_GET['edit']) ? $rowEdit['service_name'] : '' ?>">
-                                                </div>
-
-                                                <div class="col-sm-6">
-                                                    <label for="" class="form-label">Harga</label>
-                                                    <input type="number" class="form-control" name="price" placeholder="Masukkan harga paket" required value="<?php echo isset($_GET['edit']) ? $rowEdit['price'] : '' ?>">
-                                                </div>
-
-                                                <div class="col-sm-12">
-                                                    <label for="" class="form-label">Deskripsi</label>
-                                                    <textarea class="form-control mySummernote" name="description" placeholder="Masukkan note" required><?php echo isset($_GET['edit']) ? $rowEdit['description'] : '' ?></textarea>
-                                                </div> 
-                                            </div>
-                                           
-                                            <div class="mb-3">
-                                                <button class="btn btn-primary" name="<?php echo isset($_GET['edit']) ? 'edit' : 'simpan' ?>" type="submit">Simpan</button>
-                                            </div>
-                                        </form>
-
-                                        
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>No</th>
+                                                    <th>No. Invoice</th>
+                                                    <th>Nama Customer</th>
+                                                    <th>Tgl Order</th>
+                                                    <th>Status Order</th>
+                                                    <th>Aksi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php $no = 1; while ($rowOrder = mysqli_fetch_assoc($queryTransOrder)) { ?>
+                                                <tr>
+                                                    <td><?php echo $no++ ?></td>
+                                                    <td><?php echo $rowOrder['order_code'] ?></td>
+                                                    <td><?php echo $rowOrder['customer_name'] ?></td>
+                                                    <td><?php echo $rowOrder['order_date'] ?></td>
+                                                    <td><?php echo $rowOrder['order_status'] ?></td>
+                                                    <td>
+                                                        <a href="tambah-transaction.php?print=<?php echo $rowOrder['id'] ?>" class="btn btn-success btn-sm">
+                                                            <span class="tf-icon bx bx-print bx-18px"></span>
+                                                        </a>
+                                                        <a onclick="return confirm('Apakah Anda yakin akan menghapus data ini?')" href="transaction.php?delete=<?php echo $rowOrder['id'] ?>" class="btn btn-danger btn-sm">
+                                                            <span class="tf-icon bx bx-trash bx-18px"></span>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                <?php } ?>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </div>
@@ -211,8 +185,8 @@
     <!-- Core JS -->
     <!-- build:js assets/vendor/js/core.js -->
    <?php
-   include 'inc/footer.php';
-   ?>
+    include "inc/footer.php";
+    ?>
 </body>
 
 </html>

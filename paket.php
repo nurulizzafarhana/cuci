@@ -78,7 +78,7 @@
                         <div class="row">
                             <div class="col-sm-12">
                                 <div class="card">
-                                    <div class="card-header">Data User</div>
+                                    <div class="card-header">Data Paket Service</div>
                                     <div class="card-body">
                                         <?php if(isset($_GET['hapus'])): ?>
                                         <div class="alert alert-success" role="alert">
@@ -106,7 +106,7 @@
                                                 <tr>
                                                     <td><?php echo $no++ ?></td>
                                                     <td><?php echo $rowService['service_name'] ?></td>
-                                                    <td><?= 'Rp ' . number_format($rowService['price'], 0, ',', '.') ?></td>
+                                                    <td><?= 'Rp' . number_format($rowService['price'], 0, ',', '.') ?></td>
                                                     <td><?php echo $rowService['description'] ?></td>
                                                     <td>
                                                         <a href="tambah-paket.php?edit=<?php echo $rowService['id'] ?>" class="btn btn-success btn-sm">

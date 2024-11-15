@@ -3,7 +3,7 @@
   //muncul/pilih sebuah atau semua kolom dari table user
   include 'koneksi.php';
   
-  $queryUser = mysqli_query($koneksi, "SELECT * FROM level ORDER BY id DESC");
+  $queryLevel = mysqli_query($koneksi, "SELECT * FROM level ORDER BY id DESC");
 
   //mysqli_fetch_assoc($query) = untuk menjadikan hasil query menjadi sebuah data (object/array)
 
@@ -100,15 +100,15 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <?php $no = 1; while ($rowUser = mysqli_fetch_assoc($queryUser)) { ?>
+                                                <?php $no = 1; while ($rowLevel = mysqli_fetch_assoc($queryLevel)) { ?>
                                                 <tr>
                                                     <td><?php echo $no++ ?></td>
-                                                    <td><?php echo $rowUser['nama_level'] ?></td>
+                                                    <td><?php echo $rowLevel['nama_level'] ?></td>
                                                     <td>
-                                                        <a href="tambah-level.php?edit=<?php echo $rowUser['id'] ?>" class="btn btn-success btn-sm">
+                                                        <a href="tambah-level.php?edit=<?php echo $rowLevel['id'] ?>" class="btn btn-success btn-sm">
                                                             <span class="tf-icon bx bx-pencil bx-18px"></span>
                                                         </a>
-                                                        <a onclick="return confirm('Apakah Anda yakin akan menghapus data ini?')" href="level.php?delete=<?php echo $rowUser['id'] ?>" class="btn btn-danger btn-sm">
+                                                        <a onclick="return confirm('Apakah Anda yakin akan menghapus data ini?')" href="level.php?delete=<?php echo $rowLevel['id'] ?>" class="btn btn-danger btn-sm">
                                                             <span class="tf-icon bx bx-trash bx-18px"></span>
                                                         </a>
                                                     </td>

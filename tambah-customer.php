@@ -9,33 +9,9 @@
     $phone = $_POST['phone'];
     $address = $_POST['address'];
 
-    //$_POST: form input name=''
-    //$_GET: url ?param='nilai'
-    //$_FILES: from uploaded files
-
-    // if(!empty($_FILES['foto']['name'])){
-    //     $nama_foto = $_FILES['foto']['name'];
-    //     $ukuran_foto = $_FILES['foto']['size'];
-
-
-    //     //png, jpg, jpeg
-    //     $ext = array('png', 'jpg', 'jpeg');
-    //     $extFoto = pathinfo($nama_foto, PATHINFO_EXTENSION);
-
-    //     // jika extension foto tidak ada/ tidak sesuai dengan ext yang telah di-declare di array $ext
-    //     if (!in_array($extFoto, $ext)) {
-    //         echo "Ekstensi/jenis file tidak ditemukan. Ekstensi yang diizinkan: " . implode(", ", $extFoto);
-    //         die;
-    //     }else {
-    //         //pindah directory gambar ke folder upload (tmp/temporary path)
-    //         move_uploaded_file($_FILES['foto']['tmp_name'], 'upload/' . $nama_foto);
-
-    //         $insert = mysqli_query($koneksi, "INSERT INTO user (nama, email, password, foto) VALUES ('$nama', '$email', '$password','$nama_foto')");
-
-    //     }
-    // } else {
+    
     $insert = mysqli_query($koneksi, "INSERT INTO customer (customer_name, phone, address) VALUES ('$customer_name', '$phone', '$address')");
-    // }
+        
 
     header("location:customer.php?tambah=berhasil");
   }
@@ -129,6 +105,12 @@
                                         </div>
                                         <?php endif ?>
 
+                                        <div class="mb-3">
+                                            <a href="customer.php" class="btn btn-secondary">
+                                                <i class="fas fa-arrow-left"></i>
+                                            </a>
+                                        </div>
+
 
                                         <form action="" method="POST" enctype="multipart/form-data">
                                             <div class="mb-3 row">
@@ -144,7 +126,7 @@
 
                                                 <div class="col-sm-12">
                                                     <label for="" class="form-label">Alamat</label>
-                                                    <input type="text" class="form-control" name="address" placeholder="Masukkan note" required value="<?php echo isset($_GET['edit']) ? $rowEdit['address'] : '' ?>">
+                                                    <textarea class="form-control mySummernote" name="address" placeholder="Masukkan address" required><?php echo isset($_GET['edit']) ? $rowEdit['address'] : '' ?></textarea>
                                                 </div> 
                                             </div>
                                            

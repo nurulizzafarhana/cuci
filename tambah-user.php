@@ -138,6 +138,12 @@
                                         </div>
                                         <?php endif ?>
 
+                                        <div class="mb-3">
+                                            <a href="user.php" class="btn btn-secondary">
+                                                <i class="fas fa-arrow-left"></i>
+                                            </a>
+                                        </div>
+
 
                                         <form action="" method="POST" enctype="multipart/form-data">
                                             <div class="mb-3 row">

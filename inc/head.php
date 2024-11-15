@@ -12,6 +12,8 @@
 <!-- Icons. Uncomment required icon fonts -->
  <link rel="stylesheet" href="assets/assets/vendor/fonts/boxicons.css" />
 <link rel="stylesheet" href="assets/assets/vendor/fonts/boxicons.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 
 <!-- Core CSS -->
 <link rel="stylesheet" href="assets/assets/vendor/css/core.css" class="template-customizer-core-css" />
@@ -22,6 +24,10 @@
 <link rel="stylesheet" href="assets/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
 
 <link rel="stylesheet" href="assets/assets/vendor/libs/apex-charts/apex-charts.css" />
+
+<!-- summernote CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote.min.css" rel="stylesheet">
+
 
 <!-- Page CSS -->
 
