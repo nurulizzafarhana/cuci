@@ -20,13 +20,21 @@ JOIN
   //mysqli_fetch_assoc($query) = untuk menjadikan hasil query menjadi sebuah data (object/array)
 
   //jika parameter ada ?delete=value[id] param
-  if (isset($_GET['delete'])) {
-    $id = $_GET['delete']; //mengambil nilai params
+// Delete operation
+if (isset($_GET['delete'])) {
+    $id = $_GET['delete'];
 
-    //query / perintah hapus
-    $delete = mysqli_query($koneksi, "DELETE FROM transaction WHERE id='$id'");
-    header("location:transaction.php?hapus=berhasil");
-  }
+    // Query to delete the transaction
+    $delete = mysqli_query($koneksi, "DELETE FROM trans_order WHERE id='$id'");
+
+    if ($delete) {
+        header("location:transaction.php?hapus=berhasil");
+        exit(); // Always exit after a header redirect
+    } else {
+        echo "<script>alert('Error: " . mysqli_error($koneksi) . "');</script>";
+    }
+}
+
 ?>
 
 
@@ -121,12 +129,28 @@ JOIN
                                                     <td><?php echo $rowOrder['order_code'] ?></td>
                                                     <td><?php echo $rowOrder['customer_name'] ?></td>
                                                     <td><?php echo $rowOrder['order_date'] ?></td>
-                                                    <td><?php echo $rowOrder['order_status'] ?></td>
                                                     <td>
-                                                        <a href="tambah-transaction.php?print=<?php echo $rowOrder['id'] ?>" class="btn btn-success btn-sm">
-                                                            <span class="tf-icon bx bx-print bx-18px"></span>
+                                                        <?php 
+                                                            switch ($rowOrder['order_status']) {
+                                                                case '1':
+                                                                    $badge = "<span class='badge bg-primary'>Sudah dikembalikan</span>";
+                                                                    break;
+                                                                
+                                                                default:
+                                                                    $badge = "<span class='badge bg-warning'>Baru</span>";
+                                                                    break;
+                                                            }
+                                                            echo $badge;
+                                                        ?> 
+                                                    </td>
+                                                    <td>
+                                                        <a href="tambah-transaction.php?detail=<?php echo $rowOrder['order_id']?>" class="btn btn-primary btn-sm">
+                                                            <span class="tf-icon bx bx-show bx-18px"></span>
                                                         </a>
-                                                        <a onclick="return confirm('Apakah Anda yakin akan menghapus data ini?')" href="transaction.php?delete=<?php echo $rowOrder['id'] ?>" class="btn btn-danger btn-sm">
+                                                        <a target="_blank" href="print.php?id=<?php echo $rowOrder['order_id']?>" class="btn btn-secondary btn-sm">
+                                                            <span class="tf-icon bx bx-printer bx-18px"></span>
+                                                        </a>
+                                                        <a onclick="return confirm('Apakah Anda yakin akan menghapus data ini?')" href="transaction.php?delete=<?php echo $rowOrder['order_id'] ?>" class="btn btn-danger btn-sm">
                                                             <span class="tf-icon bx bx-trash bx-18px"></span>
                                                         </a>
                                                     </td>

@@ -3,6 +3,8 @@ include 'koneksi.php';
 $id = $_SESSION['id'];
 $queryLogin = mysqli_query($koneksi, "SELECT * FROM user WHERE id='$id'");
 $rowLoginUser = mysqli_fetch_assoc($queryLogin);
+
+$query
 ?>
 
 
@@ -64,7 +66,7 @@ $rowLoginUser = mysqli_fetch_assoc($queryLogin);
                             <span class="fw-semibold d-block">
                               <?php echo isset($_SESSION['nama']) ? $_SESSION['nama'] : '' ?>
                             </span>
-                            <small class="text-muted">Admin</small>
+                            <small class="text-muted"><?php echo isset($_SESSION['nama_level']) ? $_SESSION['nama_level'] : '' ?></small>
                           </div>
                         </div>
                       </a>
