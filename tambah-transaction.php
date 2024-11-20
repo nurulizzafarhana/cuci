@@ -13,7 +13,7 @@ $queryCustomer = mysqli_query($koneksi, "SELECT customer.customer_name, customer
 LEFT JOIN customer ON customer.id = trans_order.id_customer 
 WHERE trans_order.id = '$id'");
 
-$customerDetail = mysqli_fetch_assoc($queryCustomer);
+$customerDetail = mysqli_fetch_all($queryCustomer, MYSQLI_ASSOC);
 
 $queryService = mysqli_query($koneksi, "SELECT id, service_name FROM type_of_service");
 $rowService = mysqli_fetch_all($queryService, MYSQLI_ASSOC);
@@ -166,11 +166,11 @@ if (isset($_POST['simpan'])) {
                                             <table class="table table-bordered table-striped">
                                                 <tr>
                                                     <th>Nama</th>
-                                                    <th><?php echo isset($customerDetail['customer_name']) ? $customerDetail['customer_name'] : 'N/A'; ?></th>
+                                                    <th><?php echo isset($customerDetail[0]['customer_name']) ? $customerDetail[0]['customer_name'] : 'N/A'; ?></th>
                                                 </tr>
                                                 <tr>
                                                     <th>No. Telp</th>
-                                                    <th><?php echo isset($customerDetail['phone']) ? $customerDetail['phone'] : 'N/A'; ?></th>
+                                                    <th><?php echo isset($customerDetail[0]['phone']) ? $customerDetail[0]['phone'] : 'N/A'; ?></th>
                                                 </tr>
                                             </table>
                                         </div>
