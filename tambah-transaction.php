@@ -9,7 +9,7 @@ $id = isset($_GET['detail']) ? $_GET['detail'] : '';
 $queryTransDetail = mysqli_query($koneksi, "SELECT trans_order.order_code, trans_order.order_date, trans_order.order_status, type_of_service.service_name, type_of_service.price, trans_order_detail.* FROM trans_order_detail LEFT JOIN type_of_service ON type_of_service.id = trans_order_detail.id_service LEFT JOIN trans_order ON trans_order.id = trans_order_detail.id_order WHERE trans_order_detail.id_order = '$id'");
 $rowTransDetail = mysqli_fetch_all($queryTransDetail, MYSQLI_ASSOC);
 
-$queryCustomer = mysqli_query($koneksi, "SELECT customer.customer_name, customer.phone FROM trans_order 
+$queryCustomer = mysqli_query($koneksi, "SELECT customer.customer_name, customer.phone, customer.address FROM trans_order 
 LEFT JOIN customer ON customer.id = trans_order.id_customer 
 WHERE trans_order.id = '$id'");
 
@@ -171,6 +171,10 @@ if (isset($_POST['simpan'])) {
                                                 <tr>
                                                     <th>No. Telp</th>
                                                     <th><?php echo isset($customerDetail[0]['phone']) ? $customerDetail[0]['phone'] : 'N/A'; ?></th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Alamat</th>
+                                                    <th><?php echo isset($customerDetail[0]['address']) ? $customerDetail[0]['address'] : 'N/A'; ?></th>
                                                 </tr>
                                             </table>
                                         </div>
