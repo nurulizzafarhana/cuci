@@ -17,49 +17,48 @@
                  customer.phone,
                  customer.address
           FROM trans_order
-          JOIN customer ON trans_order.id_customer = customer.id";
+          JOIN customer ON trans_order.id_customer = customer.id WHERE 1";
 
-        //   if ($tanggal_dari != "") {
-        //     $query .= " WHERE order_date>='$tanggal_dari'";
-        //   }
+          if ($tanggal_dari != "") {
+            $query .= " AND order_date >= '$tanggal_dari'";
+          }
 
-        //   if ($tanggal_sampai != "") {
-        //     $query .= " AND order_date<='$tanggal_sampai'";
-        //   }
+          if ($tanggal_sampai != "") {
+            $query .= " AND order_date <= '$tanggal_sampai'";
+          }
 
-        //   if ($order_status != "") {
-        //     $query .= " AND order_status ='$order_status'";
-        //   }
+          if ($order_status != "") {
+            $query .= " AND order_status = '$order_status'";
+          }
 
-        //   $query .= " ORDER BY trans_order.id DESC";
+          $query .= " ORDER BY trans_order.id DESC";
 
 
-        //   $queryTransOrder = mysqli_query($koneksi, $query);
 
 // Initialize an array to hold the conditions
-$conditions = [];
+// $conditions = [];
 
-// Add conditions based on input
-if ($tanggal_dari != "") {
-    $conditions[] = "trans_order.order_date >= '$tanggal_dari'";
-}
+// // Add conditions based on input
+// if ($tanggal_dari != "") {
+//     $conditions[] = "trans_order.order_date >= '$tanggal_dari'";
+// }
 
-if ($tanggal_sampai != "") {
-    $conditions[] = "trans_order.order_date <= '$tanggal_sampai'";
-}
+// if ($tanggal_sampai != "") {
+//     $conditions[] = "trans_order.order_date <= '$tanggal_sampai'";
+// }
 
-// Handle order status filter
-if ($order_status !== "") {
-    $conditions[] = "trans_order.order_status = '$order_status'";
-}
+// // Handle order status filter
+// if ($order_status !== "") {
+//     $conditions[] = "trans_order.order_status = '$order_status'";
+// }
 
-// Combine conditions with AND and add to query if there are any conditions
-if (count($conditions) > 0) {
-    $query .= " WHERE " . implode(" AND ", $conditions);
-}
+// // Combine conditions with AND and add to query if there are any conditions
+// if (count($conditions) > 0) {
+//     $query .= " WHERE " . implode(" AND ", $conditions);
+// }
 
 // Order the results
-$query .= " ORDER BY trans_order.id DESC";
+// $query .= " ORDER BY trans_order.id DESC";
 
 $queryTransOrder = mysqli_query($koneksi, $query);
 
