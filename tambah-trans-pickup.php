@@ -5,7 +5,7 @@ include 'koneksi.php';
 // Fetch customers and services
 
 
-$id = isset($_GET['detail']) ? $_GET['detail'] : '';
+$id = isset($_GET['ambil']) ? $_GET['ambil'] : '';
 $queryTransDetail = mysqli_query($koneksi, "SELECT trans_order.order_code, trans_order.order_date, trans_order.order_status, type_of_service.service_name, type_of_service.price, trans_order_detail.* FROM trans_order_detail LEFT JOIN type_of_service ON type_of_service.id = trans_order_detail.id_service LEFT JOIN trans_order ON trans_order.id = trans_order_detail.id_order WHERE trans_order_detail.id_order = '$id'");
 $rowTransDetail = mysqli_fetch_all($queryTransDetail, MYSQLI_ASSOC);
 
@@ -97,12 +97,12 @@ if (isset($_POST['simpan'])) {
 
                 <!-- Detail Transaksi Eye -->
 
-                    <?php if (isset($_GET['detail'])): ?>
+                    <?php if (isset($_GET['ambil'])): ?>
 
                     <div class="container-xxl flex-grow-1 container-p-y">
                         <div class="row">
                             <div class="mb-3">
-                                <a href="transaction.php" class="btn btn-secondary">
+                                <a href="tambah-transaction.php?detail=<?php echo $rowTransDetail[0]['id_order'] ?>" class="btn btn-secondary">
                                     <i class="fas fa-arrow-left"></i>
                                 </a>
                             </div>
@@ -112,11 +112,11 @@ if (isset($_POST['simpan'])) {
                                     <div class="card-body">
                                         <div class="row">
                                             <div class="col-sm-6">
-                                                <h5>Transaksi Laundry <?php echo isset($customerDetail[0]['customer_name']) ? $customerDetail[0]['customer_name'] : 'N/A'; ?></h5>
+                                                <h5>Pengambilan Laundry <?php echo isset($customerDetail[0]['customer_name']) ? $customerDetail[0]['customer_name'] : 'N/A'; ?></h5>
                                             </div>
                                             <div class="col-sm-6" align="right">
                                                 <a href="print.php?id=<?php echo $rowTransDetail[0]['id_order'] ?>" class="btn btn-success">Print</a>
-                                                <a href="tambah-trans-pickup.php?ambil=<?php echo $rowTransDetail[0]['id_order'] ?>" class="btn btn-warning">Ambil Cucian</a>
+                                                <a href="tambah-trans-pickup.php?ambil=<?php echo $id ?>" class="btn btn-warning">Ambil Cucian</a>
                                             </div>
                                         </div>
                                     </div>
@@ -178,28 +178,72 @@ if (isset($_POST['simpan'])) {
                                     <div class="card-header">
                                         <h5>Transaksi Detail</h5>
                                         <div class="card-body">
-                                            <table class="table table-bordered table-striped">
-                                                <thead>
-                                                    <tr>
-                                                        <th>No. </th>
-                                                        <th>Nama Paket</th>
-                                                        <th>Harga</th>
-                                                        <th>Qty</th>
-                                                        <th>Sub Total</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <?php $no = 1; foreach ($rowTransDetail as $key => $value): ?>
+                                            <form action="" method="POST">
+                                                <table class="table table-bordered table-striped">
+                                                    <thead>
                                                         <tr>
-                                                            <td><?php echo $no++?></td>
-                                                            <td><?php echo $value['service_name']?></td>
-                                                            <td><?php echo "Rp" . number_format($value['price'])?></td>
-                                                            <td><?php echo $value['qty']?></td>
-                                                            <td><?php echo "Rp" . number_format($value['subtotal'])?></td>
+                                                            <th>No. </th>
+                                                            <th>Nama Paket</th>
+                                                            <th>Harga</th>
+                                                            <th>Qty</th>
+                                                            <th>Sub Total</th>
                                                         </tr>
-                                                    <?php endforeach ?>
-                                                </tbody>
-                                            </table>
+                                                    </thead>
+                                                    <tbody>
+                                                        <?php $no = 1; $total = 0; foreach ($rowTransDetail as $key => $value): ?>
+                                                            <tr>
+                                                                <td><?php echo $no++?></td>
+                                                                <td><?php echo $value['service_name']?></td>
+                                                                <td><?php echo "Rp" . number_format($value['price'])?></td>
+                                                                <td><?php echo $value['qty']?></td>
+                                                                <td><?php echo "Rp" . number_format($value['subtotal'])?></td>
+                                                            </tr>
+                                                            <?php 
+                                                            $total += $value['subtotal'];
+                                                            ?>
+                                                        <?php endforeach ?>
+                                                        <tr>
+                                                            <td colspan="4" class="text-end">
+                                                                <strong>TOTAL KESELURUHAN</strong>
+                                                            </td>
+                                                            <td>
+                                                                <strong><?php echo "Rp" . number_format($total)?></strong>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="4" class="text-end">
+                                                                <strong>
+                                                                    DIBAYAR
+                                                                </strong>
+                                                            </td>
+                                                            <td>
+                                                                <strong>
+                                                                    <input type="number" name="pickup_pay" placeholder="Bayar" class="form-control">
+                                                                </strong>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="4" class="text-end">
+                                                                <strong>
+                                                                    KEMBALIAN
+                                                                </strong>
+                                                            </td>
+                                                            <td>
+                                                                <strong>
+                                                                    <input type="number" name="pickup_change" placeholder="Kembalian" class="form-control">
+                                                                </strong>
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td colspan="5" class="text-end">
+                                                                <button class="btn btn-primary" name="proses_kembalian">Proses Kembalian</button>
+                                                                <button class="btn btn-success" name="simpan_transaksi">Simpan Transaksi</button>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
