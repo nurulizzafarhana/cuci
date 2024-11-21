@@ -102,6 +102,7 @@ if (isset($_POST['simpan'])) {
                 
                 <div class="content-wrapper">
 
+                <!-- DETAIL -->
                 <!-- Detail Transaksi Eye -->
 
                     <?php if (isset($_GET['detail'])): ?>
@@ -122,8 +123,12 @@ if (isset($_POST['simpan'])) {
                                                 <h5>Transaksi Laundry <?php echo isset($customerDetail[0]['customer_name']) ? $customerDetail[0]['customer_name'] : 'N/A'; ?></h5>
                                             </div>
                                             <div class="col-sm-6" align="right">
-                                                <a href="print.php?id=<?php echo $rowTransDetail[0]['id_order'] ?>" class="btn btn-success">Print</a>
+                                                <a target="_blank" href="print.php?id=<?php echo $rowTransDetail[0]['id_order'] ?>" class="btn btn-success">Print</a>
+
+                                                <?php if ($rowTransDetail[0]['order_status'] == 0): ?>
                                                 <a href="tambah-trans-pickup.php?ambil=<?php echo $rowTransDetail[0]['id_order'] ?>" class="btn btn-warning">Ambil Cucian</a>
+                                                <?php endif ?>
+
                                             </div>
                                         </div>
                                     </div>
@@ -134,6 +139,11 @@ if (isset($_POST['simpan'])) {
                                 <div class="card">
                                     <div class="card-header">
                                         <h5>Data Transaksi</h5>
+
+                                        <?php
+                                        include 'helper.php';
+                                        ?>
+
                                         <div class="card-body">
                                             <table class="table table-bordered table-striped">
                                                 <tr>
@@ -146,7 +156,7 @@ if (isset($_POST['simpan'])) {
                                                 </tr>
                                                 <tr>
                                                     <th>Status</th>
-                                                    <th><?php echo isset($rowTransDetail[0]['order_status']) ? $rowTransDetail[0]['order_status'] : 'N/A'; ?></th>
+                                                    <th><?php echo changeStatus($rowTransDetail[0]['order_status']) ?></th>
                                                 </tr>
                                             </table>
                                         </div>

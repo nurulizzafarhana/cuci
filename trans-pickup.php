@@ -98,7 +98,7 @@ if (isset($_GET['delete'])) {
                         <div class="row">
                             <div class="col-sm-12">
                                 <div class="card">
-                                    <div class="card-header">Data Transaksi Laundry</div>
+                                    <div class="card-header">Data Transaksi</div>
                                     <div class="card-body">
                                         <?php if(isset($_GET['hapus'])): ?>
                                         <div class="alert alert-success" role="alert">

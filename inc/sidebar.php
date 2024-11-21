@@ -134,12 +134,12 @@
                   </a>
                 </li>
                 <li class="menu-item">
-                  <a href="auth-register-basic.html" class="menu-link">
+                  <a href="trans-pickup.php" class="menu-link">
                     <div data-i18n="Basic">Transaksi Pengembalian</div>
                   </a>
                 </li>
                 <li class="menu-item">
-                  <a href="auth-forgot-password-basic.html" class="menu-link">
+                  <a href="laporan.php" class="menu-link">
                     <div data-i18n="Basic">Laporan</div>
                   </a>
                 </li>

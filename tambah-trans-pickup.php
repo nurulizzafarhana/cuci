@@ -6,7 +6,7 @@ include 'koneksi.php';
 
 
 $id = isset($_GET['ambil']) ? $_GET['ambil'] : '';
-$queryTransDetail = mysqli_query($koneksi, "SELECT trans_order.order_code, trans_order.order_date, trans_order.order_status, type_of_service.service_name, type_of_service.price, trans_order_detail.* FROM trans_order_detail LEFT JOIN type_of_service ON type_of_service.id = trans_order_detail.id_service LEFT JOIN trans_order ON trans_order.id = trans_order_detail.id_order WHERE trans_order_detail.id_order = '$id'");
+$queryTransDetail = mysqli_query($koneksi, "SELECT trans_order.order_code, trans_order.order_date, trans_order.order_status, trans_order.id_customer, type_of_service.service_name, type_of_service.price, trans_order_detail.* FROM trans_order_detail LEFT JOIN type_of_service ON type_of_service.id = trans_order_detail.id_service LEFT JOIN trans_order ON trans_order.id = trans_order_detail.id_order WHERE trans_order_detail.id_order = '$id'");
 $rowTransDetail = mysqli_fetch_all($queryTransDetail, MYSQLI_ASSOC);
 
 $queryCustomer = mysqli_query($koneksi, "SELECT customer.customer_name, customer.phone, customer.address FROM trans_order 
@@ -17,6 +17,10 @@ $customerDetail = mysqli_fetch_all($queryCustomer, MYSQLI_ASSOC);
 
 $queryService = mysqli_query($koneksi, "SELECT id, service_name FROM type_of_service");
 $rowService = mysqli_fetch_all($queryService, MYSQLI_ASSOC);
+
+
+
+$queryTransPickup = mysqli_query($koneksi, "SELECT * FROM  trans_laundry_pickup WHERE id_order = '$id'");
 
 
 
@@ -39,39 +43,21 @@ if (mysqli_num_rows($queryInvoice) > 0) {
 }
 
 // Handle form submissions, mengambil  nilai input dgn attribute name="" di form
-if (isset($_POST['simpan'])) {
+if (isset($_POST['simpan_transaksi'])) {
     $id_customer = $_POST['id_customer'];
-    $order_code = $_POST['order_code'];
-    $order_date = $_POST['order_date'];
-    
-    $id_service = $_POST['id_service'];
-    $qty = $_POST['qty'];
+    $id_order = $_POST['id_order'];
+    $pickup_pay = $_POST['pickup_pay'];
+    $pickup_change = $_POST['pickup_change'];
+
+    $pickup_date=date("Y-m-d");
 
     // Insert into table trans_order
-    $insertTransOrder = mysqli_query($koneksi, "INSERT INTO trans_order (id_customer, order_code, order_date) VALUES ('$id_customer', '$order_code', '$order_date')");
+    $insertPickUp = mysqli_query($koneksi, "INSERT INTO trans_laundry_pickup (id_customer, id_order, pickup_pay, pickup_change, pickup_date) VALUES ('$id_customer', '$id_order', '$pickup_pay', '$pickup_change', '$pickup_date')");
 
-    $last_id = mysqli_insert_id($koneksi);
-
-    // Loop through services
-    foreach ($id_service as $key => $value) {
-        // Check if the service ID and quantity are valid
-        if (!empty($value) && !empty($qty[$key]) && (int)$qty[$key] > 0) {
-            $id_service = $value; // Current service ID
-            $quantity = (int)$qty[$key]; // Current quantity
-
-            // Query to get the price from table type_of_service
-            $queryPaket = mysqli_query($koneksi, "SELECT price FROM type_of_service WHERE id='$id_service'");
-            if ($rowPaketTransc = mysqli_fetch_assoc($queryPaket)) {
-                $harga = $rowPaketTransc['price'];
-                $subTotal = $quantity * $harga;
-
-                // Insert into trans_order_detail
-                $insertDetailTransaksi = mysqli_query($koneksi, "INSERT INTO trans_order_detail (id_order, id_service, qty, subtotal) VALUES ('$last_id', '$id_service', '$quantity', '$subTotal')");
-            }
-        }
-    }
+    //Update order_status di tbl trans_order > 1 (diambil)
+    $updateTransOrder = mysqli_query($koneksi, "UPDATE trans_order SET order_status = 1 WHERE id='$id_order'");
     
-    header("location:transaction.php?tambah=berhasil");
+    header("location:transaction.php?pickup=berhasil");
 }
 
 ?>
@@ -115,8 +101,8 @@ if (isset($_POST['simpan'])) {
                                                 <h5>Pengambilan Laundry <?php echo isset($customerDetail[0]['customer_name']) ? $customerDetail[0]['customer_name'] : 'N/A'; ?></h5>
                                             </div>
                                             <div class="col-sm-6" align="right">
-                                                <a href="print.php?id=<?php echo $rowTransDetail[0]['id_order'] ?>" class="btn btn-success">Print</a>
-                                                <a href="tambah-trans-pickup.php?ambil=<?php echo $id ?>" class="btn btn-warning">Ambil Cucian</a>
+                                                <a target="_blank" href="print.php?id=<?php echo $rowTransDetail[0]['id_order'] ?>" class="btn btn-success">Print</a>
+                                                <a href="" class="btn btn-warning">Ambil Cucian</a>
                                             </div>
                                         </div>
                                     </div>
@@ -127,6 +113,11 @@ if (isset($_POST['simpan'])) {
                                 <div class="card">
                                     <div class="card-header">
                                         <h5>Data Transaksi</h5>
+
+                                        <?php
+                                        include 'helper.php';
+                                        ?>
+
                                         <div class="card-body">
                                             <table class="table table-bordered table-striped">
                                                 <tr>
@@ -139,7 +130,7 @@ if (isset($_POST['simpan'])) {
                                                 </tr>
                                                 <tr>
                                                     <th>Status</th>
-                                                    <th><?php echo isset($rowTransDetail[0]['order_status']) ? $rowTransDetail[0]['order_status'] : 'N/A'; ?></th>
+                                                    <th><?php echo changeStatus($rowTransDetail[0]['order_status']) ?></th>
                                                 </tr>
                                             </table>
                                         </div>
@@ -218,7 +209,16 @@ if (isset($_POST['simpan'])) {
                                                             </td>
                                                             <td>
                                                                 <strong>
-                                                                    <input type="number" name="pickup_pay" placeholder="Bayar" class="form-control">
+
+                                                                    <?php if (mysqli_num_rows($queryTransPickup)): ?>
+                                                                        <!-- Jika data kembalian sudah ada di database -->
+                                                                        <?php $rowTransPickup = mysqli_fetch_assoc($queryTransPickup); ?>
+                                                                        <input type="text" name="pickup_pay" placeholder="Bayar" class="form-control" value="<?php echo "Rp" . number_format($rowTransPickup['pickup_pay']) ?>" readonly>
+                                                                    <?php else: ?>
+                                                                        <!-- Jika data nominal bayar belum ada, hitung manual -->
+                                                                        <input type="number" name="pickup_pay" placeholder="Bayar" class="form-control" value="<?php echo isset($_POST['pickup_pay']) ? $_POST['pickup_pay'] : '' ?>" required>
+                                                                    <?php endif ?>
+                                                                        
                                                                 </strong>
                                                             </td>
                                                         </tr>
@@ -241,18 +241,31 @@ if (isset($_POST['simpan'])) {
 
                                                             <td>
                                                                 <strong>
-                                                                    <input type="number" name="pickup_change" placeholder="Kembalian" class="form-control" readonly value="<?php echo isset ($kembalian)?$kembalian:0 ?>">
+                                                                    <?php if (mysqli_num_rows($queryTransPickup) > 0): ?>
+                                                                        <!-- Jika data kembalian sudah ada di database -->
+                                                                        <input type="text" name="pickup_change" placeholder="Kembalian" class="form-control" value="<?php echo "Rp" . number_format($rowTransPickup['pickup_change']); ?>" readonly>
+                                                                    <?php else: ?>
+                                                                        <!-- Jika data kembalian belum ada, hitung manual -->
+                                                                        <input type="text" name="pickup_change" placeholder="Kembalian" class="form-control" value="<?php echo isset($kembalian) ? $kembalian : '0'; ?>" readonly>
+
+                                                                    <?php endif; ?>
+
                                                                     <input type="hidden" name="total" value="<?php echo $total ?>">
+                                                                    <input type="hidden" name="id_customer" value="<?php echo $rowTransDetail[0]['id_customer'] ?>">
+                                                                    <input type="hidden" name="id_order" value="<?php echo $rowTransDetail[0]['id_order'] ?>">
                                                                 </strong>
                                                             </td>
                                                         </tr>
 
+
+                                                        <?php if($rowTransDetail[0]['order_status'] == 0): ?>
                                                         <tr>
                                                             <td colspan="5" class="text-end">
                                                                 <button class="btn btn-primary" name="proses_kembalian">Proses Kembalian</button>
                                                                 <button class="btn btn-success" name="simpan_transaksi">Simpan Transaksi</button>
                                                             </td>
                                                         </tr>
+                                                        <?php endif ?>
                                                     </tbody>
                                                 </table>
                                             </form>

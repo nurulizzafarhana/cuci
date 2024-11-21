@@ -3,19 +3,65 @@
   //muncul/pilih sebuah atau semua kolom dari table user
   include 'koneksi.php';
   
-  $queryTransOrder = mysqli_query($koneksi, "SELECT 
-    trans_order.id AS order_id,
-    trans_order.order_code,
-    trans_order.order_date,
-    trans_order.order_status,
-    customer.id AS customer_id,
-    customer.customer_name,
-    customer.phone,
-    customer.address
-FROM 
-    trans_order
-JOIN 
-    customer ON trans_order.id_customer = customer.id");
+
+  $tanggal_dari = isset($_GET['tanggal_dari']) ? $_GET['tanggal_dari'] : '';
+  $tanggal_sampai = isset($_GET['tanggal_sampai']) ? $_GET['tanggal_sampai'] : '';
+  $order_status = isset($_GET['order_status']) ? $_GET['order_status'] : '';
+
+  $query = "SELECT trans_order.id AS order_id,
+                 trans_order.order_code,
+                 trans_order.order_date,
+                 trans_order.order_status,
+                 customer.id AS customer_id,
+                 customer.customer_name,
+                 customer.phone,
+                 customer.address
+          FROM trans_order
+          JOIN customer ON trans_order.id_customer = customer.id";
+
+        //   if ($tanggal_dari != "") {
+        //     $query .= " WHERE order_date>='$tanggal_dari'";
+        //   }
+
+        //   if ($tanggal_sampai != "") {
+        //     $query .= " AND order_date<='$tanggal_sampai'";
+        //   }
+
+        //   if ($order_status != "") {
+        //     $query .= " AND order_status =$order_status";
+        //   }
+
+        //   $query .= " ORDER BY trans_order.id DESC";
+
+
+        //   $queryTransOrder = mysqli_query($koneksi, $query);
+
+// Initialize an array to hold the conditions
+$conditions = [];
+
+// Add conditions based on input
+if ($tanggal_dari != "") {
+    $conditions[] = "trans_order.order_date >= '$tanggal_dari'";
+}
+
+if ($tanggal_sampai != "") {
+    $conditions[] = "trans_order.order_date <= '$tanggal_sampai'";
+}
+
+// Handle order status filter
+if ($order_status !== "") {
+    $conditions[] = "trans_order.order_status = '$order_status'";
+}
+
+// Combine conditions with AND and add to query if there are any conditions
+if (count($conditions) > 0) {
+    $query .= " WHERE " . implode(" AND ", $conditions);
+}
+
+// Order the results
+$query .= " ORDER BY trans_order.id DESC";
+
+$queryTransOrder = mysqli_query($koneksi, $query);
 
   //mysqli_fetch_assoc($query) = untuk menjadikan hasil query menjadi sebuah data (object/array)
 
@@ -106,9 +152,36 @@ if (isset($_GET['delete'])) {
                                         </div>
                                         <?php endif ?>
 
-                                        <div align="right" class="mb-3">
-                                            <a href="tambah-transaction.php" class="btn btn-primary">Tambah</a>
-                                        </div>
+                                       
+                                        <!-- FILTER DATA TRANSAKSI -->
+                                         <form action="" method="GET">
+                                            <div class="mb-3 row">
+                                                <div class="col-sm-3">
+                                                    <label for="">Dari Tanggal</label>
+                                                    <input type="date" name="tanggal_dari" class="form-control">
+                                                </div>
+
+                                                <div class="col-sm-3">
+                                                    <label for="">Sampai Tanggal</label>
+                                                    <input type="date" name="tanggal_sampai" class="form-control">
+                                                </div>
+
+                                                <div class="col-sm-3">
+                                                    <label for="">Status</label>
+                                                    <select name="order_status" id="" class="form-control">
+                                                        <option value="">--Pilih Status--</option>
+                                                        <option value="0">Baru</option>
+                                                        <option value="1">Sudah dikembalikan</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-sm-3 p-3">
+                                                    <button name="filter" class="mt-2 btn btn-primary">Tampilkan laporan</button>
+                                                </div>
+                                            </div>
+                                         </form>
+
+
 
 
                                         <table class="table table-bordered">
@@ -150,9 +223,7 @@ if (isset($_GET['delete'])) {
                                                         <a target="_blank" href="print.php?id=<?php echo $rowOrder['order_id']?>" class="btn btn-secondary btn-sm">
                                                             <span class="tf-icon bx bx-printer bx-18px"></span>
                                                         </a>
-                                                        <a onclick="return confirm('Apakah Anda yakin akan menghapus data ini?')" href="transaction.php?delete=<?php echo $rowOrder['order_id'] ?>" class="btn btn-danger btn-sm">
-                                                            <span class="tf-icon bx bx-trash bx-18px"></span>
-                                                        </a>
+                                                        
                                                     </td>
                                                 </tr>
                                                 <?php } ?>
