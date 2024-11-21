@@ -228,9 +228,21 @@ if (isset($_POST['simpan'])) {
                                                                     KEMBALIAN
                                                                 </strong>
                                                             </td>
+
+                                                            <?php
+                                                                if (isset($_POST['proses_kembalian'])) {
+                                                                    
+                                                                    $dibayar = $_POST['pickup_pay'];
+
+                                                                    $kembalian = 0;
+                                                                    $kembalian = $dibayar - $total;
+                                                                }
+                                                            ?>
+
                                                             <td>
                                                                 <strong>
-                                                                    <input type="number" name="pickup_change" placeholder="Kembalian" class="form-control">
+                                                                    <input type="number" name="pickup_change" placeholder="Kembalian" class="form-control" readonly value="<?php echo isset ($kembalian)?$kembalian:0 ?>">
+                                                                    <input type="hidden" name="total" value="<?php echo $total ?>">
                                                                 </strong>
                                                             </td>
                                                         </tr>
