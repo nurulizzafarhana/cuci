@@ -28,7 +28,7 @@
         //   }
 
         //   if ($order_status != "") {
-        //     $query .= " AND order_status =$order_status";
+        //     $query .= " AND order_status ='$order_status'";
         //   }
 
         //   $query .= " ORDER BY trans_order.id DESC";
