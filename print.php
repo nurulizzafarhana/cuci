@@ -8,12 +8,36 @@ $id = isset($_GET['id']) ? $_GET['id'] : '';
 
 
 
-$queryDetail = mysqli_query($koneksi, "SELECT trans_order.id, trans_order.order_code, type_of_service.service_name, type_of_service.price, customer.customer_name, trans_order_detail.* FROM trans_order_detail LEFT JOIN trans_order ON trans_order.id = trans_order_detail.id_order LEFT JOIN type_of_service ON type_of_service.id = trans_order_detail.id_service LEFT JOIN customer ON customer.id = trans_order.id_customer WHERE trans_order_detail.id_order='$id'");
+$queryDetail = mysqli_query($koneksi, "
+    SELECT 
+        trans_order.id, 
+        trans_order.order_code, 
+        type_of_service.service_name, 
+        type_of_service.price, 
+        customer.customer_name, 
+        trans_order_detail.*, 
+        trans_laundry_pickup.pickup_pay, 
+        trans_laundry_pickup.pickup_change, 
+        trans_laundry_pickup.pickup_date,
+        trans_laundry_pickup.discount,
+        trans_laundry_pickup.final_total
+    FROM trans_order_detail
+    LEFT JOIN trans_order 
+        ON trans_order.id = trans_order_detail.id_order
+    LEFT JOIN type_of_service 
+        ON type_of_service.id = trans_order_detail.id_service
+    LEFT JOIN customer 
+        ON customer.id = trans_order.id_customer
+    LEFT JOIN trans_laundry_pickup 
+        ON trans_laundry_pickup.id_order = trans_order.id
+    WHERE trans_order_detail.id_order = '$id'
+");
 
 $row = [];
 while ($rowDetail = mysqli_fetch_assoc($queryDetail)) {
-    $row [] = $rowDetail;
+    $row[] = $rowDetail;
 }
+
 
 ?>
 
@@ -77,7 +101,9 @@ while ($rowDetail = mysqli_fetch_assoc($queryDetail)) {
 
         .total,
         .payment,
-        .change {
+        .change,
+        .disc,
+        .final_total {
             display: flex;
             justify-content: space-evenly;
             padding: 5px 0;
@@ -114,7 +140,9 @@ while ($rowDetail = mysqli_fetch_assoc($queryDetail)) {
 
             .total,
             .payment,
-            .change {
+            .change,
+            .disc,
+            .final_total {
                 padding: 2px 0;
             }
         }
@@ -135,6 +163,7 @@ while ($rowDetail = mysqli_fetch_assoc($queryDetail)) {
         <div class="struk-body">
             <div class="container-sm">
                 <p>Invoice No: <?php echo $row[0]['order_code']; ?></p>
+                <p>Tanggal Pengambilan Laundry <?php echo $row[0]['pickup_date']; ?></p>
                 <p>Nama Customer: <?php echo $row[0]['customer_name'] ?></p>
             </div>
             <table>
@@ -160,17 +189,27 @@ while ($rowDetail = mysqli_fetch_assoc($queryDetail)) {
 
             <div class="total">
                 <span>Total: </span>
-                <span><?php echo "Rp " . number_format($row[0]['total_harga']) ?></span>
+                <span><?php echo "Rp " . number_format($row[0]['subtotal']) ?></span>
+            </div>
+
+            <div class="disc">
+                <span>Diskon: </span>
+                <span><?php echo number_format($row[0]['discount']) . "%" ?></span>
+            </div>
+
+            <div class="final_total">
+                <span>Total Akhir: </span>
+                <span><?php echo "Rp" . number_format($row[0]['final_total']) ?></span>
             </div>
 
             <div class="payment">
                 <span>Bayar: </span>
-                <span><?php echo "Rp " . number_format($row[0]['nominal_bayar']) ?></span>
+                <span><?php echo "Rp " . number_format($row[0]['pickup_pay']) ?></span>
             </div>
 
             <div class="change">
                 <span>Kembalian: </span>
-                <span><?php echo "Rp " . number_format($row[0]['kembalian']) ?></span>
+                <span><?php echo "Rp " . number_format($row[0]['pickup_change']) ?></span>
             </div>
         </div>
 

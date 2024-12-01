@@ -44,21 +44,26 @@ if (mysqli_num_rows($queryInvoice) > 0) {
 
 // Handle form submissions, mengambil  nilai input dgn attribute name="" di form
 if (isset($_POST['simpan_transaksi'])) {
+    // Ambil data dari form
     $id_customer = $_POST['id_customer'];
     $id_order = $_POST['id_order'];
     $pickup_pay = $_POST['pickup_pay'];
     $pickup_change = $_POST['pickup_change'];
+    $discount = $_POST['discount'];  // Ambil nilai diskon
+    $final_total = $_POST['final_total']; // Ambil nilai final_total dari form
+    $pickup_date = date("Y-m-d");
 
-    $pickup_date=date("Y-m-d");
+    // Insert data ke tabel trans_laundry_pickup
+    $insertPickUp = mysqli_query($koneksi, "INSERT INTO trans_laundry_pickup (id_customer, id_order, pickup_pay, pickup_change, pickup_date, discount, final_total) 
+        VALUES ('$id_customer', '$id_order', '$pickup_pay', '$pickup_change', '$pickup_date', '$discount', '$final_total')");
 
-    // Insert into table trans_order
-    $insertPickUp = mysqli_query($koneksi, "INSERT INTO trans_laundry_pickup (id_customer, id_order, pickup_pay, pickup_change, pickup_date) VALUES ('$id_customer', '$id_order', '$pickup_pay', '$pickup_change', '$pickup_date')");
-
-    //Update order_status di tbl trans_order > 1 (diambil)
+    // Update status order di trans_order
     $updateTransOrder = mysqli_query($koneksi, "UPDATE trans_order SET order_status = 1 WHERE id='$id_order'");
-    
+
     header("location:transaction.php?pickup=berhasil");
 }
+
+
 
 ?>
 
@@ -181,90 +186,104 @@ if (isset($_POST['simpan_transaksi'])) {
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <?php $no = 1; $total = 0; foreach ($rowTransDetail as $key => $value): ?>
+                                                        <?php
+                                                        $no = 1;
+                                                        $total = 0;
+                                                        foreach ($rowTransDetail as $key => $value): ?>
                                                             <tr>
-                                                                <td><?php echo $no++?></td>
-                                                                <td><?php echo $value['service_name']?></td>
-                                                                <td><?php echo "Rp" . number_format($value['price'])?></td>
-                                                                <td><?php echo $value['qty']?></td>
-                                                                <td><?php echo "Rp" . number_format($value['subtotal'])?></td>
+                                                                <td><?php echo $no++ ?></td>
+                                                                <td><?php echo $value['service_name'] ?></td>
+                                                                <td><?php echo "Rp" . number_format($value['price']) ?></td>
+                                                                <td><?php echo $value['qty'] ?></td>
+                                                                <td><?php echo "Rp" . number_format($value['subtotal']) ?></td>
                                                             </tr>
-                                                            <?php 
+                                                            <?php
                                                             $total += $value['subtotal'];
-                                                            ?>
-                                                        <?php endforeach ?>
+                                                        endforeach;
+                                                        ?>
                                                         <tr>
                                                             <td colspan="4" class="text-end">
                                                                 <strong>TOTAL KESELURUHAN</strong>
                                                             </td>
                                                             <td>
-                                                                <strong><?php echo "Rp" . number_format($total)?></strong>
+                                                                <strong><?php echo "Rp" . number_format($total) ?></strong>
                                                             </td>
                                                         </tr>
+
+                                                        <!-- Tambahkan input diskon -->
                                                         <tr>
                                                             <td colspan="4" class="text-end">
-                                                                <strong>
-                                                                    DIBAYAR
-                                                                </strong>
+                                                                <strong>DISKON (%)</strong>
                                                             </td>
                                                             <td>
-                                                                <strong>
-
-                                                                    <?php if (mysqli_num_rows($queryTransPickup)): ?>
-                                                                        <!-- Jika data kembalian sudah ada di database -->
-                                                                        <?php $rowTransPickup = mysqli_fetch_assoc($queryTransPickup); ?>
-                                                                        <input type="text" name="pickup_pay" placeholder="Bayar" class="form-control" value="<?php echo "Rp" . number_format($rowTransPickup['pickup_pay']) ?>" readonly>
-                                                                    <?php else: ?>
-                                                                        <!-- Jika data nominal bayar belum ada, hitung manual -->
-                                                                        <input type="number" name="pickup_pay" placeholder="Bayar" class="form-control" value="<?php echo isset($_POST['pickup_pay']) ? $_POST['pickup_pay'] : '' ?>" required>
-                                                                    <?php endif ?>
-                                                                        
-                                                                </strong>
+                                                                <input type="number" name="discount" id="discount" class="form-control" value="<?php echo isset($_POST['discount']) ? $_POST['discount'] : '0' ?>" min="0" max="100">
                                                             </td>
                                                         </tr>
+
+                                                        <!-- Menampilkan diskon dan total akhir -->
+                                                        <?php
+                                                        $discount = isset($_POST['discount']) ? $_POST['discount'] : 0;
+                                                        $discount_amount = ($total * $discount) / 100;
+                                                        $final_total = $total - $discount_amount;
+                                                        ?>
+
                                                         <tr>
                                                             <td colspan="4" class="text-end">
-                                                                <strong>
-                                                                    KEMBALIAN
-                                                                </strong>
+                                                                <strong>DISKON</strong>
                                                             </td>
+                                                            <td>
+                                                                <strong><?php echo "Rp" . $discount_amount ?></strong>
+                                                            </td>
+                                                        </tr>
 
-                                                            <?php
-                                                                if (isset($_POST['proses_kembalian'])) {
-                                                                    
+                                                        <tr>
+                                                            <td colspan="4" class="text-end">
+                                                                <strong>TOTAL AKHIR</strong>
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" class="form-control" name="final_total" value="<?php echo "Rp" . number_format($final_total) ?>" readonly>
+                                                            </td>
+                                                        </tr>
+
+
+                                                        <tr>
+                                                            <td colspan="4" class="text-end">
+                                                                <strong>DIBAYAR</strong>
+                                                            </td>
+                                                            <td>
+                                                                <input type="number" name="pickup_pay" placeholder="Bayar" class="form-control" value="<?php echo isset($_POST['pickup_pay']) ? $_POST['pickup_pay'] : '' ?>" required>
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td colspan="4" class="text-end">
+                                                                <strong>KEMBALIAN</strong>
+                                                            </td>
+                                                            <td>
+                                                                <?php
+                                                                // Menghitung kembalian jika ada pembayaran
+                                                                if (isset($_POST['pickup_pay'])) {
                                                                     $dibayar = $_POST['pickup_pay'];
-
-                                                                    $kembalian = 0;
-                                                                    $kembalian = $dibayar - $total;
+                                                                    $kembalian = $dibayar - $final_total;
                                                                 }
-                                                            ?>
-
-                                                            <td>
-                                                                <strong>
-                                                                    <?php if (mysqli_num_rows($queryTransPickup) > 0): ?>
-                                                                        <!-- Jika data kembalian sudah ada di database -->
-                                                                        <input type="text" name="pickup_change" placeholder="Kembalian" class="form-control" value="<?php echo "Rp" . number_format($rowTransPickup['pickup_change']); ?>" readonly>
-                                                                    <?php else: ?>
-                                                                        <!-- Jika data kembalian belum ada, hitung manual -->
-                                                                        <input type="text" name="pickup_change" placeholder="Kembalian" class="form-control" value="<?php echo isset($kembalian) ? $kembalian : '0'; ?>" readonly>
-
-                                                                    <?php endif; ?>
-
-                                                                    <input type="hidden" name="total" value="<?php echo $total ?>">
-                                                                    <input type="hidden" name="id_customer" value="<?php echo $rowTransDetail[0]['id_customer'] ?>">
-                                                                    <input type="hidden" name="id_order" value="<?php echo $rowTransDetail[0]['id_order'] ?>">
-                                                                </strong>
+                                                                ?>
+                                                                <input type="text" name="pickup_change" placeholder="Kembalian" class="form-control" value="<?php echo isset($kembalian) ? $kembalian : '0' ?>" readonly>
                                                             </td>
                                                         </tr>
 
 
-                                                        <?php if($rowTransDetail[0]['order_status'] == 0): ?>
-                                                        <tr>
-                                                            <td colspan="5" class="text-end">
-                                                                <button class="btn btn-primary" name="proses_kembalian">Proses Kembalian</button>
-                                                                <button class="btn btn-success" name="simpan_transaksi">Simpan Transaksi</button>
-                                                            </td>
-                                                        </tr>
+                                                        <input type="hidden" name="total" value="<?php echo $total ?>">
+                                                        <input type="hidden" name="final_total" value="<?php echo $final_total ?>">
+                                                        <input type="hidden" name="id_customer" value="<?php echo $rowTransDetail[0]['id_customer'] ?>">
+                                                        <input type="hidden" name="id_order" value="<?php echo $rowTransDetail[0]['id_order'] ?>">
+
+                                                        <?php if ($rowTransDetail[0]['order_status'] == 0): ?>
+                                                            <tr>
+                                                                <td colspan="5" class="text-end">
+                                                                    <button class="btn btn-primary" name="proses_kembalian">Proses Kembalian</button>
+                                                                    <button class="btn btn-success" name="simpan_transaksi">Simpan Transaksi</button>
+                                                                </td>
+                                                            </tr>
                                                         <?php endif ?>
                                                     </tbody>
                                                 </table>
@@ -273,6 +292,7 @@ if (isset($_POST['simpan_transaksi'])) {
                                     </div>
                                 </div>
                             </div>
+
 
                         </div>
                     </div>
